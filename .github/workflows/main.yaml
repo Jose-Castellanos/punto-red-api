@@ -1,4 +1,4 @@
-name: Build and Push Java Image to AWS ECR
+name: Build and Push Next.js and Proxy Images to AWS ECR
 
 on:
   push:
@@ -52,32 +52,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Cache Docker layers
       - name: Cache Docker Layers
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          # Cambiamos hashing de Node a archivos de Gradle
           key: ${{ runner.os }}-buildx-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/gradle.properties', '**/gradle.lockfile') }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build and Push Java Image
-        id: build-java-image
+      - name: Build and java image
+        id: build-nextjs
         uses: docker/build-push-action@v5
         with:
           context: .
-          dockerfile: Dockerfile
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.increment-git-tag.outputs.git-tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           outputs: type=registry
 
-      - name: Export Java Image URI
+      - name: Export java img
         id: export-java-image
         run: echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.increment-git-tag.outputs.git-tag }}" >> $GITHUB_OUTPUT
-
       - name: Move Cache
         run: |
           rm -rf /tmp/.buildx-cache
@@ -89,12 +85,12 @@ jobs:
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.export-java-image.outputs.image }}
+          image: ${{ steps.export-nextjs-image.outputs.image }}
 
       - name: Deploy updated Task Definition to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.update-task-java.outputs.task-definition }}
+          task-definition: ${{ steps.update-task-nextjs.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
