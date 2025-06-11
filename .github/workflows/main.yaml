@@ -1,4 +1,4 @@
-name: Build and Push Next.js and Proxy Images to AWS ECR
+name: Build and Push java to AWS ECR
 
 on:
   push:
