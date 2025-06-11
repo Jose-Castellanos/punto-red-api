@@ -55,7 +55,7 @@ jobs:
 
 
       - name: Build and java image
-        id: build-nextjs
+        id: build-java
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -79,7 +79,7 @@ jobs:
       - name: Deploy updated Task Definition to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.update-task-nextjs.outputs.task-definition }}
+          task-definition: ${{ steps.update-task-java.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
