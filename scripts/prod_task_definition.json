@@ -1,0 +1,42 @@
+{
+  "family": "puntored-api",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "256",           
+  "memory": "512",        
+  "executionRoleArn": "arn:aws:iam::869935065634:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::869935065634:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "containerDefinitions": [
+    {
+      "name": "puntored-api",
+      "image": "dummy",
+      "cpu": 256,       
+      "memory": 512,    
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        { "name": "ENV", "value": "PROD" },
+        { "name": "AWS_REGION", "value": "sa-east-1" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/puntored/puntored-frontend",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "server"
+        }
+      }
+    }
+  ],
+  "volumes": [],
+  "tags": []
+}
